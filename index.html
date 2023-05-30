@@ -22,26 +22,24 @@
       methods: {
         updateMessage() {
           this.message = 'Updated message';
+
+          // Simulate a long-running operation
+          setTimeout(() => {
+            // Update the count after a delay
+            this.count++;
+          }, 1000);
         },
         increaseCount() {
+          // Simulate heavy computation
+          for (let i = 0; i < 1000000000; i++) {
+            // Do some useless computation
+          }
+
+          // Update the count
           this.count++;
         }
       }
     });
-
-    // Delay the page load by 2 seconds
-    window.onload = function() {
-      setTimeout(function() {
-        // Remove the "display: none" style to show the content after the delay
-        document.body.style.display = 'block';
-      }, 3000);
-    };
   </script>
-
-  <style>
-    body {
-      display: none; /* Hide the content initially */
-    }
-  </style>
 </body>
 </html>
