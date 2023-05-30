@@ -38,7 +38,7 @@
     // Introduce an inline script that performs heavy computations
     // This will block rendering and slow down the page load
     const startTime = performance.now();
-    while (performance.now() - startTime < 3000) { /* Delay execution for 3 seconds */ }
+    while (performance.now() - startTime < 2000) { /* Delay execution for 3 seconds */ }
 
     new Vue({
       el: '#app',
