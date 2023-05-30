@@ -28,6 +28,20 @@
         }
       }
     });
+
+    // Delay the page load by 2 seconds
+    window.onload = function() {
+      setTimeout(function() {
+        // Remove the "display: none" style to show the content after the delay
+        document.body.style.display = 'block';
+      }, 2000);
+    };
   </script>
+
+  <style>
+    body {
+      display: none; /* Hide the content initially */
+    }
+  </style>
 </body>
 </html>
