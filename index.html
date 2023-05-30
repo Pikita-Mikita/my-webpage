@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reactive Framework Example</title>
+  <script src="https://unpkg.com/vue@2.6.14/dist/vue.js"></script>
+</head>
+<body>
+  <div id="app">
+    <p>{{ message }}</p>
+    <p>Count: {{ count }}</p>
+    <button @click="updateMessage">Update Message</button>
+    <button @click="increaseCount">Increase Count</button>
+    <p>Memoized Result: {{ memoizedResult }}</p>
+    <button @click="resetCount">Reset Count</button>
+    <p v-if="isLoading">Loading...</p>
+    <ul>
+      <li v-for="item in items" :key="item.id">
+        {{ item.name }}
+        <button @click="removeItem(item.id)">Remove</button>
+      </li>
+    </ul>
+    <form @submit.prevent="addItem">
+      <input type="text" v-model="newItem" placeholder="Enter item name" />
+      <button type="submit">Add Item</button>
+    </form>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        message: 'Hello, Reactive World!',
+        count: 0,
+        isLoading: false,
+        cache: {},
+        items: [],
+        newItem: '',
+        memoizedResult: null
+      },
+      methods: {
+        updateMessage() {
+          this.message = 'Updated message';
+        },
+        increaseCount() {
+          this.count++;
+          this.memoizedResult = this.calculateResult(); // Update the memoized result immediately
+        },
+        resetCount() {
+          this.count = 0;
+          this.memoizedResult = this.calculateResult(); // Update the memoized result immediately
+        },
+        calculateResult() {
+          if (this.cache[this.count] !== undefined) {
+            return this.cache[this.count];
+          }
+
+          if (!this.isLoading) {
+            this.isLoading = true;
+            this.loadData().then(() => {
+              const result = this.count * 2;
+              this.cache[this.count] = result;
+              this.isLoading = false;
+              this.memoizedResult = result; // Set the memoized result once data is loaded
+            });
+          }
+        },
+        loadData() {
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              // Simulate data loading
+              const data = [
+                { id: 1, name: 'Item 1' },
+                { id: 2, name: 'Item 2' },
+                { id: 3, name: 'Item 3' }
+              ];
+              this.items = data;
+              resolve();
+            }, 2000);
+          });
+        },
+        removeItem(itemId) {
+          this.items = this.items.filter((item) => item.id !== itemId);
+        },
+        addItem() {
+          const newItem = this.newItem.trim();
+          if (newItem !== '') {
+            const newItemObj = {
+              id: this.items.length + 1,
+              name: newItem
+            };
+            this.items.push(newItemObj);
+            this.newItem = '';
+          }
+        }
+      },
+      computed: {
+        // Rest of the computed properties...
+      }
+    });
+  </script>
+</body>
+</html>
