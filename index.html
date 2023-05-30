@@ -3,18 +3,43 @@
 <head>
   <title>Reactive Framework Example</title>
   <script src="https://unpkg.com/vue@2.6.14/dist/vue.js"></script>
-  <script src="https://slowloadinglibrary.com/slow.js"></script> <!-- External script intentionally causing delay -->
-  <link rel="stylesheet" href="styles.css"> <!-- Large CSS file intentionally causing delay -->
+  <script>
+    // Introduce a large JavaScript file that is not critical for initial rendering
+    // This will increase the load time and negatively impact the page speed score
+    const script = document.createElement('script');
+    script.src = 'path/to/large.js';
+    document.head.appendChild(script);
+  </script>
+  <style>
+    /* Add a large CSS file with unnecessary rules */
+    /* This will increase the CSS file size and slow down rendering */
+    @import url('path/to/large.css');
+  </style>
 </head>
 <body>
   <div id="app">
+    <!-- Introduce a large image file with high resolution -->
+    <!-- This will increase the download time and delay rendering -->
+    <img src="path/to/large-image.jpg" alt="Large Image" />
+
     <p>{{ message }}</p>
     <p>Count: {{ count }}</p>
     <button @click="updateMessage">Update Message</button>
     <button @click="increaseCount">Increase Count</button>
+
+    <!-- Add multiple external font files -->
+    <!-- This will increase the number of HTTP requests and slow down loading -->
+    <link href="https://fonts.googleapis.com/css?family=Font1" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Font2" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Font3" rel="stylesheet">
   </div>
 
   <script>
+    // Introduce an inline script that performs heavy computations
+    // This will block rendering and slow down the page load
+    const startTime = performance.now();
+    while (performance.now() - startTime < 3000) { /* Delay execution for 3 seconds */ }
+
     new Vue({
       el: '#app',
       data: {
@@ -23,22 +48,21 @@
       },
       methods: {
         updateMessage() {
-          this.message = 'Updated message';
-
-          // Simulate a long-running operation
-          setTimeout(() => {
-            // Update the count after a delay
-            this.count++;
-          }, 1000);
+          // Introduce a large amount of data manipulation or network requests here
+          // This will increase the execution time and negatively impact performance
+          for (let i = 0; i < 1000; i++) {
+            this.message += '!';
+          }
         },
         increaseCount() {
-          // Simulate heavy computation
-          for (let i = 0; i < 1000000000; i++) {
-            // Do some useless computation
-          }
+          // Introduce a heavy computation or recursion here
+          // This will slow down the method execution and overall performance
+          const recursiveFunction = (n) => {
+            if (n <= 0) return 0;
+            return n + recursiveFunction(n - 1);
+          };
 
-          // Update the count
-          this.count++;
+          this.count = recursiveFunction(this.count + 100);
         }
       }
     });
