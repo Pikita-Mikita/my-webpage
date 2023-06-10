@@ -2,27 +2,41 @@
 <html>
 <head>
   <title>Reactive Framework Example</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
   <script src="https://unpkg.com/vue@2.6.14/dist/vue.js"></script>
 </head>
 <body>
   <div id="app">
-    <p>{{ message }}</p>
-    <p>Count: {{ count }}</p>
-    <button @click="updateMessage">Update Message</button>
+    <h1 class="title">Reactive Framework Example</h1>
+    <div class="count-container">
+      <span class="count-label">Count:</span>
+      <span class="count-value">{{ count }}</span>
+    </div>
     <button @click="increaseCount">Increase Count</button>
-    <p>Memoized Result: {{ memoizedResult }}</p>
+    <button @click="decreaseCount">Decrease Count</button>
     <button @click="resetCount">Reset Count</button>
-    <p v-if="isLoading">Loading...</p>
-    <ul>
+    <hr>
+    <p>{{ message }}</p>
+    <button @click="updateMessage">Update Message</button>
+    <h2>Items</h2>
+    <p v-if="isLoading" class="loading">Loading...</p>
+    <ul class="item-list">
       <li v-for="item in items" :key="item.id">
         {{ item.name }}
         <button @click="removeItem(item.id)">Remove</button>
+        <button @click="editItem(item.id)">Edit</button>
       </li>
     </ul>
-    <form @submit.prevent="addItem">
+    <form v-if="isEditMode" @submit.prevent="saveItem" class="edit-item-container">
+      <input type="text" v-model="editedItemName" />
+      <button type="submit">Save</button>
+      <button @click="cancelEditMode">Cancel</button>
+    </form>
+    <form @submit.prevent="addItem" class="add-item-container">
       <input type="text" v-model="newItem" placeholder="Enter item name" />
       <button type="submit">Add Item</button>
     </form>
+    <button @click="removeAllItems">Remove All Items</button>
   </div>
 
   <script>
@@ -32,10 +46,11 @@
         message: 'Hello, Reactive World!',
         count: 0,
         isLoading: false,
-        cache: {},
         items: [],
         newItem: '',
-        memoizedResult: null
+        isEditMode: false,
+        editedItemId: null,
+        editedItemName: ''
       },
       methods: {
         updateMessage() {
@@ -43,58 +58,66 @@
         },
         increaseCount() {
           this.count++;
-          this.memoizedResult = this.calculateResult(); // Update the memoized result immediately
+        },
+        decreaseCount() {
+          this.count--;
         },
         resetCount() {
           this.count = 0;
-          this.memoizedResult = this.calculateResult(); // Update the memoized result immediately
-        },
-        calculateResult() {
-          if (this.cache[this.count] !== undefined) {
-            return this.cache[this.count];
-          }
-
-          if (!this.isLoading) {
-            this.isLoading = true;
-            this.loadData().then(() => {
-              const result = this.count * 2;
-              this.cache[this.count] = result;
-              this.isLoading = false;
-              this.memoizedResult = result; // Set the memoized result once data is loaded
-            });
-          }
         },
         loadData() {
-          return new Promise((resolve) => {
-            setTimeout(() => {
-              // Simulate data loading
-              const data = [
-                { id: 1, name: 'Item 1' },
-                { id: 2, name: 'Item 2' },
-                { id: 3, name: 'Item 3' }
-              ];
-              this.items = data;
-              resolve();
-            }, 2000);
-          });
+          this.isLoading = true;
+          setTimeout(() => {
+            // Simulate data loading
+            const data = [
+              { id: 1, name: 'Item 1' },
+              { id: 2, name: 'Item 2' },
+              { id: 3, name: 'Item 3' }
+            ];
+            this.items = data;
+            this.isLoading = false;
+          }, 2000);
         },
         removeItem(itemId) {
           this.items = this.items.filter((item) => item.id !== itemId);
+        },
+        editItem(itemId) {
+          const item = this.items.find((item) => item.id === itemId);
+          if (item) {
+            this.isEditMode = true;
+            this.editedItemId = item.id;
+            this.editedItemName = item.name;
+          }
+        },
+        saveItem() {
+          const item = this.items.find((item) => item.id === this.editedItemId);
+          if (item) {
+            item.name = this.editedItemName;
+            this.cancelEditMode();
+          }
+        },
+        cancelEditMode() {
+          this.isEditMode = false;
+          this.editedItemId = null;
+          this.editedItemName = '';
         },
         addItem() {
           const newItem = this.newItem.trim();
           if (newItem !== '') {
             const newItemObj = {
-              id: this.items.length + 1,
+              id: Date.now(),
               name: newItem
             };
             this.items.push(newItemObj);
             this.newItem = '';
           }
+        },
+        removeAllItems() {
+          this.items = [];
         }
       },
-      computed: {
-        // Rest of the computed properties...
+      mounted() {
+        this.loadData();
       }
     });
   </script>
